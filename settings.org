@@ -1,0 +1,97 @@
+#+begin_src emacs-lisp
+;;; -*- lexical-binding: t; -*-
+#+end_src
+
+* Startup
+
+Profile how long it takes for Emacs to startup
+#+begin_src emacs-lisp
+  (add-hook 'emacs-startup-hook
+	    (lambda ()
+	      (message "Emacs ready in %s with %d garbage collections."
+		       (format "%.2f seconds"
+			       (float-time
+				(time-subtract after-init-time before-init-time)))
+		       gcs-done)))
+#+end_src
+
+Start Emacs with an empty Org-mode buffer in the home directory.
+#+begin_src emacs-lisp
+    (use-package emacs
+      :init
+      (setq inhibit-startup-screen t
+	    initial-scratch-message nil
+	    initial-major-mode 'org-mode
+	    default-directory "~/"))
+#+end_src
+
+** Mitsuharu Yamamoto Emacs Configuration
+
+Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs build for macOS, we have to switch what each modifier key does back to the default.
+#+begin_src emacs-lisp
+  (use-package emacs
+    :init
+    (setq mac-option-modifier        'meta
+	  mac-right-option-modifier  'meta
+	  mac-command-modifier       'super
+	  mac-right-command-modifier 'super))
+#+end_src
+
+* User Interface
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :init
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (blink-cursor-mode -1)
+    (global-display-line-numbers-mode 1)
+    (fringe-mode 5))
+#+end_src
+
+Set fonts.
+#+begin_src emacs-lisp
+  (set-frame-font "Inconsolata for Powerline 20" nil t)
+#+end_src
+
+Set theme.
+#+begin_src emacs-lisp
+  (load-theme 'tsdh-light t)
+#+end_src
+
+* Evil
+
+** Evil Mode
+
+#+begin_src emacs-lisp
+  (use-package evil
+    :diminish
+    :bind
+    (:map evil-motion-state-map
+	  ("j" . 'evil-next-visual-line)
+	  ("k" . 'evil-previous-visual-line))
+	  ("s-w" . 'kill-this-buffer)
+    (:map evil-visual-state-map
+	  ("j" . 'evil-next-visual-line)
+	  ("k" . 'evil-previous-visual-line))
+    :init
+    (evil-mode))
+#+end_src
+
+** Evil Leader
+
+#+begin_src emacs-lisp
+  (use-package evil-leader
+    :init
+    :after (evil)
+    :diminish
+    :init
+    (global-evil-leader-mode)
+    :config
+    (evil-leader/set-leader "<SPC>")
+    (evil-leader/set-key
+      "<SPC>" 'delete-other-windows
+      "w" 'kill-this-buffer
+      "k" 'kill-buffer))
+#+end_src
