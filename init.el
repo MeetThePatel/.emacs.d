@@ -13,5 +13,7 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file 'noerror)
 
+(use-package diminish)
+
 (require 'org)
 (org-babel-load-file (expand-file-name (concat user-emacs-directory "settings.org")))
