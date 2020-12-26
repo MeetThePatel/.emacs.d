@@ -3,3 +3,4 @@ eshell/
 elpa/
 settings.el
 custom.el
+*.html

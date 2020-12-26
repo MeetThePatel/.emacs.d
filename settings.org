@@ -5,6 +5,7 @@
 ** Startup Profiling
    
    Profile how long it takes for Emacs to startup
+   
    #+begin_src emacs-lisp
      (add-hook 'emacs-startup-hook
 	       (lambda ()
@@ -16,7 +17,9 @@
    #+end_src
 
 ** Startup Screen
+
    Start Emacs with an empty Org-mode buffer in the home directory.
+   
    #+begin_src emacs-lisp
      (use-package emacs
        :init
@@ -29,6 +32,7 @@
 ** Mitsuharu Yamamoto Emacs Configuration
 
    Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs build for macOS, we have to switch what each modifier key does back to the default.
+   
    #+begin_src emacs-lisp
      (use-package emacs
        :init
@@ -49,6 +53,7 @@
       (scroll-bar-mode -1)
       (blink-cursor-mode -1)
       (global-visual-line-mode)
+      (column-number-mode 1)
       (global-display-line-numbers-mode 1)
       (fringe-mode 5))
   #+end_src
@@ -66,6 +71,7 @@
     #+end_src
 
 ** Theme
+
    #+begin_src emacs-lisp
      (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 
@@ -74,7 +80,51 @@
        (load-theme 'kaolin-breeze t))
    #+end_src
 
+** Visual Bell
+
+Instead of playing an annoying sound when an error occurs, breifly invert the colors of the modeline.
+
+#+begin_src emacs-lisp
+  (defun meet/visual-bell-modeline-flash ()
+    (let ((frame (selected-frame)))
+      (run-with-timer
+       0.1 nil
+       #'(lambda (frame)
+           (let ((inhibit-quit)
+                 (inhibit-redisplay t))
+             (invert-face 'mode-line frame)
+             (invert-face 'mode-line-inactive frame)))
+       frame)
+      (let ((inhibit-quit)
+            (inhibit-redisplay t))
+        (invert-face 'mode-line frame)
+        (invert-face 'mode-line-inactive frame))))
+
+  (setq ring-bell-function 'meet/visual-bell-modeline-flash)
+#+end_src
+   
+** HL Line
+
+HL-Line mode is a minor mode that highlights the current line.
+
+#+begin_src emacs-lisp
+  (use-package hl-line
+    :diminish
+    :hook (after-init . global-hl-line-mode))
+#+end_src
+
+** Rainbow Mode
+
+Rainbow mode is a minor-mode which highlights text representing color codes by settings the background color of the text accordingly. This works with ~rgb()~ and hexadecimal codes.
+
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :diminish
+    :hook (after-init . rainbow-mode))
+#+end_src
+
 ** Rainbow Delimiters
+
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :diminish
@@ -125,23 +175,163 @@
        :hook (org-mode . evil-org-mode))
    #+end_src
 
+** Evil Surround
+
+This minor-mode emulates surround.vim in Evil mode.
+
+#+begin_src emacs-lisp
+  (use-package evil-surround
+    :after (evil)
+    :diminish
+    :init
+    (global-evil-surround-mode 1))
+#+end_src
+
+** Evil Goggles
+
+This minor mode displays a visual hint when editing with Evil mode.
+
+#+begin_src emacs-lisp
+  (use-package evil-goggles
+    :after (evil)
+    :diminish
+    :config
+    (evil-goggles-use-diff-faces)
+    :init
+    (evil-goggles-mode))
+#+end_src
+
+** Evil Commentary
+
+This is a minor-mode that makes it easier to comment out lines of code.
+
+|---------+----------------------+---------------------------------------------------|
+| Keybind | Command              | Description                                       |
+|---------+----------------------+---------------------------------------------------|
+| =gc=      | evil-commentary      | Comments out the target of a motion.              |
+| =gy=      | evil-commentary-yank | Comments out the target of a motion and yanks it. |
+| =Super+/= | evil-commentary-line | Comments out the current line.                    |
+|---------+----------------------+---------------------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package evil-commentary
+    :after (evil)
+    :diminish
+    :init
+    (evil-commentary-mode))
+#+end_src
+
+** Evil TeX
+
+This minor-mode is a Evil toolbox for LaTeX editing.
+
+Text Object Table
+
+|-----+--------------+
+| Key | Abbreviation |
+|-----+--------------+
+| =c=   | command      |
+| =e=   | environment  |
+| =m=   | math         |
+| =M=   | display math |
+| =d=   | delimiters   |
+| =S=   | sections     |
+| =^=   | superscript  |
+| =_=   | subscript    |
+| =T=   | table cell   |
+|-----+--------------+
+
+Environment Table
+
+|-----+-------------|
+| Key | Environment |
+|-----+-------------|
+| ~e~   | equation    |
+| ~E~   | equation*   |
+| ~f~   | figure      |
+| ~i~   | itemize     |
+| ~I~   | enumerate   |
+| ~y~   | array       |
+| ~b~   | frame       |
+| ~a~   | align       |
+| ~A~   | align*      |
+| ~n~   | alignat     |
+| ~N~   | alignat*    |
+| ~r~   | eqnarray    |
+| ~l~   | flalign     |
+| ~L~   | flalign*    |
+| ~g~   | gather      |
+| ~G~   | gather*     |
+| ~m~   | multline    |
+| ~M~   | multline*   |
+| ~c~   | cases       |
+| ~ta~  | axiom       |
+| ~tc~  | corollary   |
+| ~tC~  | claim       |
+| ~td~  | definition  |
+| ~te~  | examples    |
+| ~ts~  | exercise    |
+| ~tl~  | lemma       |
+| ~tp~  | proof       |
+| ~tq~  | question    |
+| ~tr~  | remark      |
+| ~tt~  | theorem     |
+|-----+-------------|
+
+Delimiter Table
+
+|-----+--------------------------------|
+| Key | Delimiter                      |
+|-----+--------------------------------|
+| ~b~   | ~[foo]~                          |
+| ~B~   | ~\left[foo\right]~               |
+| ~c~   | ~\{foo\}~                        |
+| ~C~   | ~\left\{foo\right\}~             |
+| ~r~   | ~\langle foo\rangle~             |
+| ~R~   | ~\left\langle foo \right\langle~ |
+| ~p~   | ~(foo)~                          |
+| ~P~   | ~\left(foo\right)~               |
+|-----+--------------------------------|
+
+Examples:
+
+|-----------------------------------------------+-------------------------------------------------------+------------------------------------|
+| Starting String (~$~ indicates cursor position) | keybind                                               | Result                             |
+|-----------------------------------------------+-------------------------------------------------------+------------------------------------|
+| \ti$lde{h}                                    | ~cic~ (change inside command)                           | \tilde{~$~}                          |
+| \tilde{h$}                                    | ~cscc bar~ (change surrounding command to ~bar~)          | \bar{~$~}                            |
+| =\(\sum_{i=1}^{n} i^2$\)=                       | ~cim~ (change inner math)                               | =\(~$~\)=                              |
+| =\(\sum_{i=1}^{n} i^2$\)=                       | ~mtm~ (toggle surrounding math)                         | =\[\sum_{i=1}^{n} i^2$\]=            |
+| =\[a$^2\]=                                      | ~csmeA~ (change surrounding math to environment ~align*~  | =\begin{align*}\n a^2 \n\end{align}= |
+| =(\mu$_\nu)=                                    | ~csddP~ (change surrounding delimiter to ~\left( \right)~ | =\left(\mu$_\nu\right)=              |
+|-----------------------------------------------+-------------------------------------------------------+------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package evil-tex
+    :after (tex auctex)
+    :diminish
+    :hook ((org-mode LaTeX-mode tex-mode) . evil-tex-mode))
+#+end_src
+
 * Org
 ** Org Mode
 
    #+begin_src emacs-lisp
      (use-package org
+       :diminish (org-indent-mode)
        :config
        (setq org-hide-emphasis-markers t
-	     org-hide-block-startup t
-	     org-src-tab-acts-natively t
-	     org-src-window-setup 'split-window-below
-	     org-image-actual-width nil)
+             org-hide-block-startup t
+             org-src-tab-acts-natively t
+             org-src-window-setup 'split-window-below
+             org-image-actual-width nil)
        :hook (org-mode . org-indent-mode))
    #+end_src
 
 ** Org Bullets
 
    This minor-mode shows org-mode bullets as UTF-8 characters.
+   
    #+begin_src emacs-lisp
      (use-package org-bullets
        :hook (org-mode . org-bullets-mode))
@@ -150,6 +340,7 @@
 ** Org FragTog
 
    This minor-mode automatically toggles org-mode LaTeX fragments as the cursor enters and exits them.
+   
    #+begin_src emacs-lisp
      (use-package org-fragtog
        :hook (org-mode . org-fragtog-mode))
@@ -177,6 +368,7 @@
    #+end_src
 
 ** Ivy Rich
+
    #+begin_src emacs-lisp
      (use-package ivy-rich
        :diminish
@@ -194,6 +386,7 @@
    #+end_src
 
 ** Counsel
+
    #+begin_src emacs-lisp
      (use-package counsel
        :diminish
@@ -203,12 +396,27 @@
    #+end_src
 
 * Packages
-
 ** Elcord
 
    Elcord is a minor-mode that integrates with Discord's Rich Presence API.
+   
    #+begin_src emacs-lisp
      (use-package elcord
        :init
        (elcord-mode))
    #+end_src
+
+** Which Key
+
+WhichKey is a minor-mode that displays available keybinds in a popup side-buffer.
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :diminish
+    :config
+    (which-key-setup-side-window-bottom)
+    (which-key-setup-minibuffer)
+    (setq which-key-idle-delay 0.5)
+    :init
+    (which-key-mode))
+#+end_src
