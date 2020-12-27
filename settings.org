@@ -435,7 +435,63 @@ IBuffer-VC is a package that integrates IBuffer with Version Control information
     (ibuffer-mode . ibuffer-vc-set-filter-groups-by-vc-root))
 #+end_src
 
-* Packages
+* Company
+
+#+begin_src emacs-lisp
+  (use-package company
+    :diminish
+    :config
+    (setq company-dabbrev-downcase 0
+          company-idle-delay 0.2)
+    :hook (after-init . global-company-mode))
+#+end_src
+
+** Company Box
+
+#+begin_src emacs-lisp
+  (use-package company-box
+    :after (company)
+    :diminish
+    :hook (company-mode . company-box-mode))
+#+end_src
+
+** Company Prescient
+
+#+begin_src emacs-lisp
+  (use-package company-prescient
+    :after (company)
+    :diminish
+    :hook (company-mode . company-prescient-mode))
+#+end_src
+
+** Company QuickHelp
+
+#+begin_src emacs-lisp
+  (use-package company-quickhelp
+    :after (company)
+    :diminish
+    :bind
+    (:map company-active-map
+          ("C-c h" . company-quickhelp-manual-begin))
+    :hook (company-mode . company-quickhelp-mode))
+#+end_src
+
+** Company Emoji
+
+#+begin_src emacs-lisp
+  (use-package company-emoji
+    :after (company)
+    :diminish
+    :config
+    (add-to-list 'company-backends 'company-emoji)
+    (defun --set-emoji-font (frame)
+      "Adjust the font settings of FRAME so Emacs can display Emoji properly."
+      (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend))
+    (--set-emoji-font nil)
+    :hook (after-make-frame-functions . --set-emoji-font))
+#+end_src
+
+* Miscellaneous Packages
 ** Magit
 
 #+begin_src emacs-lisp
