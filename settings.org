@@ -443,6 +443,103 @@ IBuffer-VC is a package that integrates IBuffer with Version Control information
     :diminish)
 #+end_src
 
+** Git Gutter
+
+|-----------+--------------------------+-----------------------------------------------|
+| Keybind   | Command                  | Description                                   |
+|-----------+--------------------------+-----------------------------------------------|
+| ~<SPC> g g~ | git-gutter:popout-hunk   | Pop out the modified chunk into a new buffer. |
+| ~<SPC> g s~ | git-gutter:stage-hunk    | Stage the modified chunk.                     |
+| ~<SPC> g j~ | git-gutter:next-diff     | Move to the next modified chunk.              |
+| ~<SPC> g k~ | git-gutter:previous-diff | Move to the previous modified chunk.          |
+| ~<SPC> g R~ | git-gutter:revert-hunk   | Revert the modified chunk.                    |
+|-----------+--------------------------+-----------------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package git-gutter
+    :config
+    (evil-leader/set-key
+      "g g" 'git-gutter:popup-hunk
+      "g s" 'git-gutter:stage-hunk
+      "g j" 'git-gutter:next-diff
+      "g k" 'git-gutter:previous-diff
+      "g R" 'git-gutter:revert-hunk)
+    (custom-set-variables
+     '(git-gutter:update-interval 2)
+     '(git-gutter:added-sign "+")
+     '(git-gutter:modified-sign "*")
+     '(git-gutter:deleted-sign "-")
+     '(git-gutter:hide-gutter nil))
+    (set-face-background 'git-gutter:added "#00b894")
+    (set-face-foreground 'git-gutter:added "#00b894")
+    (set-face-background 'git-gutter:modified "#fdcb6e")
+    (set-face-foreground 'git-gutter:modified "#fdcb6e")
+    (set-face-background 'git-gutter:deleted "#ff7675")
+    (set-face-foreground 'git-gutter:deleted "#ff7675")
+    :init
+    (global-git-gutter-mode 1))
+#+end_src
+
+** Winum
+
+Winum is a minor-mode to navigate windows and frames using numbers.
+
+|---------+-----------------------+---------------------|
+| Keybind | Command               | Description         |
+|---------+-----------------------+---------------------|
+| ~S-1~     | winum-select-window-1 | Switch to window 1. |
+| ~S-2~     | winum-select-window-2 | Switch to window 2. |
+| ~S-3~     | winum-select-window-3 | Switch to window 3. |
+| ~S-4~     | winum-select-window-4 | Switch to window 4. |
+| ~S-5~     | winum-select-window-5 | Switch to window 5. |
+| ~S-6~     | winum-select-window-6 | Switch to window 6. |
+| ~S-7~     | winum-select-window-7 | Switch to window 7. |
+| ~S-8~     | winum-select-window-8 | Switch to window 8. |
+| ~S-9~     | winum-select-window-9 | Switch to window 9. |
+| ~S-0~     | winum-select-window-0 | Switch to window 0. |
+|---------+-----------------------+---------------------|
+
+#+begin_src emacs-lisp
+  (use-package winum
+    :init
+    (setq winum-auto-setup-mode-line t)
+    (setq winum-keymap
+            (let ((map (make-sparse-keymap)))
+              (define-key map (kbd "s-1") 'winum-select-window-1)
+              (define-key map (kbd "s-2") 'winum-select-window-2)
+              (define-key map (kbd "s-3") 'winum-select-window-3)
+              (define-key map (kbd "s-4") 'winum-select-window-4)
+              (define-key map (kbd "s-5") 'winum-select-window-5)
+              (define-key map (kbd "s-6") 'winum-select-window-6)
+              (define-key map (kbd "s-7") 'winum-select-window-7)
+              (define-key map (kbd "s-8") 'winum-select-window-8)
+              (define-key map (kbd "s-9") 'winum-select-window-9)
+              (define-key map (kbd "s-0") 'winum-select-window-0)
+              map))
+    :config
+    (winum-mode))
+#+end_src
+
+** EShell Toggle
+
+This package shows/hides a eshell buffer at the bottom of the active window with the directory of its buffer.
+
+|---------+---------------+-------------------------------|
+| Keybind | Command       | Description                   |
+|---------+---------------+-------------------------------|
+| ~C-=~     | eshell-toggle | Toggles a eshell side-buffer. |
+|---------+---------------+-------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package eshell-toggle
+    :config
+    (defun eshell-toggle--make-buffer-name ()
+      "Generate EShell-Toggle buffer name."
+      "*eshell-toggle*")
+    :bind
+    (("C-=" . eshell-toggle)))
+#+end_src
+
 ** Elcord
 
 Elcord is a minor-mode that integrates with Discord's Rich Presence API.
