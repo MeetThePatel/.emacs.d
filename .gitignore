@@ -4,3 +4,4 @@ elpa/
 settings.el
 custom.el
 *.html
+transient/

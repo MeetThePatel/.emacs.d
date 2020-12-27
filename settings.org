@@ -4,81 +4,81 @@
 * Startup
 ** Startup Profiling
    
-   Profile how long it takes for Emacs to startup
+Profile how long it takes for Emacs to startup
    
-   #+begin_src emacs-lisp
-     (add-hook 'emacs-startup-hook
-	       (lambda ()
-		 (message "Emacs ready in %s with %d garbage collections."
-			  (format "%.2f seconds"
-				  (float-time
-				   (time-subtract after-init-time before-init-time)))
-			  gcs-done)))
-   #+end_src
+#+begin_src emacs-lisp
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (message "Emacs ready in %s with %d garbage collections."
+                       (format "%.2f seconds"
+                               (float-time
+                                (time-subtract after-init-time before-init-time)))
+                       gcs-done)))
+#+end_src
 
 ** Startup Screen
 
-   Start Emacs with an empty Org-mode buffer in the home directory.
+Start Emacs with an empty Org-mode buffer in the home directory.
    
-   #+begin_src emacs-lisp
-     (use-package emacs
-       :init
-       (setq inhibit-startup-screen t
-	     initial-scratch-message nil
-	     initial-major-mode 'org-mode
-	     default-directory "~/"))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package emacs
+    :init
+    (setq inhibit-startup-screen t
+          initial-scratch-message nil
+          initial-major-mode 'org-mode
+          default-directory "~/"))
+#+end_src
 
 ** Mitsuharu Yamamoto Emacs Configuration
 
-   Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs build for macOS, we have to switch what each modifier key does back to the default.
+Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs build for macOS, we have to switch what each modifier key does back to the default.
    
-   #+begin_src emacs-lisp
-     (use-package emacs
-       :init
-       (setq mac-option-modifier        'meta
-	     mac-right-option-modifier  'meta
-	     mac-command-modifier       'super
-	     mac-right-command-modifier 'super))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package emacs
+    :init
+    (setq mac-option-modifier        'meta
+          mac-right-option-modifier  'meta
+          mac-command-modifier       'super
+          mac-right-command-modifier 'super))
+#+end_src
    
 * User Interface
 
-  #+begin_src emacs-lisp
-    (use-package emacs
-      :diminish (visual-line-mode)
-      :init
-      (menu-bar-mode -1)
-      (tool-bar-mode -1)
-      (scroll-bar-mode -1)
-      (blink-cursor-mode -1)
-      (global-visual-line-mode)
-      (column-number-mode 1)
-      (global-display-line-numbers-mode 1)
-      (fringe-mode 5))
-  #+end_src
+#+begin_src emacs-lisp
+  (use-package emacs
+    :diminish (visual-line-mode)
+    :init
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (blink-cursor-mode -1)
+    (global-visual-line-mode)
+    (column-number-mode 1)
+    (global-display-line-numbers-mode 1)
+    (fringe-mode 5))
+#+end_src
 
 ** Fonts
 
-   #+begin_src emacs-lisp
-     (set-frame-font "Inconsolata for Powerline 20" nil t)
-   #+end_src
+#+begin_src emacs-lisp
+  (set-frame-font "Inconsolata for Powerline 20" nil t)
+#+end_src
 
 *** All The Icons
 
-    #+begin_src emacs-lisp
-      (use-package all-the-icons)
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package all-the-icons)
+#+end_src
 
 ** Theme
 
-   #+begin_src emacs-lisp
-     (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+#+begin_src emacs-lisp
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 
-     (use-package kaolin-themes
-       :config
-       (load-theme 'kaolin-breeze t))
-   #+end_src
+  (use-package kaolin-themes
+    :config
+    (load-theme 'kaolin-breeze t))
+#+end_src
 
 ** Visual Bell
 
@@ -134,46 +134,48 @@ Rainbow mode is a minor-mode which highlights text representing color codes by s
 * Evil
 ** Evil Mode
 
-   #+begin_src emacs-lisp
-     (use-package evil
-       :diminish
-       :bind
-       (:map evil-motion-state-map
-	     ("j" . 'evil-next-visual-line)
-	     ("k" . 'evil-previous-visual-line))
-       ("s-w" . 'kill-this-buffer)
-       (:map evil-visual-state-map
-	     ("j" . 'evil-next-visual-line)
-	     ("k" . 'evil-previous-visual-line))
-       :init
-       (evil-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package evil
+    :diminish
+    :bind
+    (:map evil-motion-state-map
+          ("j" . 'evil-next-visual-line)
+          ("k" . 'evil-previous-visual-line))
+    ("s-w" . 'kill-this-buffer)
+    (:map evil-visual-state-map
+          ("j" . 'evil-next-visual-line)
+          ("k" . 'evil-previous-visual-line))
+    :init
+    (setq evil-want-integration t
+          evil-want-keybinding nil)
+    (evil-mode))
+#+end_src
 
 ** Evil Leader
 
-   #+begin_src emacs-lisp
-     (use-package evil-leader
-       :init
-       :after (evil)
-       :diminish
-       :init
-       (global-evil-leader-mode)
-       :config
-       (evil-leader/set-leader "<SPC>")
-       (evil-leader/set-key
-	 "<SPC>" 'delete-other-windows
-	 "w" 'kill-this-buffer
-	 "k" 'kill-buffer))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package evil-leader
+    :init
+    :after (evil)
+    :diminish
+    :init
+    (global-evil-leader-mode)
+    :config
+    (evil-leader/set-leader "<SPC>")
+    (evil-leader/set-key
+      "<SPC>" 'delete-other-windows
+      "w" 'kill-this-buffer
+      "k" 'kill-buffer))
+#+end_src
 
 ** Evil Org
 
-   #+begin_src emacs-lisp
-     (use-package evil-org
-       :after (org evil)
-       :diminish
-       :hook (org-mode . evil-org-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package evil-org
+    :after (org evil)
+    :diminish
+    :hook (org-mode . evil-org-mode))
+#+end_src
 
 ** Evil Surround
 
@@ -219,6 +221,14 @@ This is a minor-mode that makes it easier to comment out lines of code.
     :diminish
     :init
     (evil-commentary-mode))
+#+end_src
+
+** Evil Collection
+
+#+begin_src emacs-lisp
+  (use-package evil-collection
+    :init
+    (evil-collection-init))
 #+end_src
 
 ** Evil TeX
@@ -316,95 +326,132 @@ Examples:
 * Org
 ** Org Mode
 
-   #+begin_src emacs-lisp
-     (use-package org
-       :diminish (org-indent-mode)
-       :config
-       (setq org-hide-emphasis-markers t
-             org-hide-block-startup t
-             org-src-tab-acts-natively t
-             org-src-window-setup 'split-window-below
-             org-image-actual-width nil)
-       :hook (org-mode . org-indent-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org
+    :diminish (org-indent-mode)
+    :config
+    (setq org-hide-emphasis-markers t
+          org-hide-block-startup t
+          org-src-tab-acts-natively t
+          org-src-window-setup 'split-window-below
+          org-image-actual-width nil)
+    :hook (org-mode . org-indent-mode))
+#+end_src
 
 ** Org Bullets
 
-   This minor-mode shows org-mode bullets as UTF-8 characters.
+This minor-mode shows org-mode bullets as UTF-8 characters.
    
-   #+begin_src emacs-lisp
-     (use-package org-bullets
-       :hook (org-mode . org-bullets-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :hook (org-mode . org-bullets-mode))
+#+end_src
 
 ** Org FragTog
 
-   This minor-mode automatically toggles org-mode LaTeX fragments as the cursor enters and exits them.
+This minor-mode automatically toggles org-mode LaTeX fragments as the cursor enters and exits them.
    
-   #+begin_src emacs-lisp
-     (use-package org-fragtog
-       :hook (org-mode . org-fragtog-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-fragtog
+    :hook (org-mode . org-fragtog-mode))
+#+end_src
    
 * Ivy
 ** Ivy
 
-   #+begin_src emacs-lisp
-     (use-package ivy
-       :diminish
-       :bind
-       (("M-x" . 'counsel-M-x)
-	("C-x C-f" . 'counsel-find-file)
-	("C-x b" . 'counsel-switch-buffer)
-	("C-h f" . 'counsel-describe-function)
-	("C-h v" . 'counsel-describe-variable)
-	("C-h s" . 'counsel-describe-symbol)
-	("C-h F" . 'counsel-describe-face)
-	("C-x L" . 'counsel-find-library)
-	("C-c C-r" . 'counsel-resume)
-	("C-`" . 'counsel-unicode-char))
-       :init
-       (ivy-mode 1))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package ivy
+    :diminish
+    :bind
+    (("M-x" . 'counsel-M-x)
+     ("C-x C-f" . 'counsel-find-file)
+     ("C-x b" . 'counsel-switch-buffer)
+     ("C-h f" . 'counsel-describe-function)
+     ("C-h v" . 'counsel-describe-variable)
+     ("C-h s" . 'counsel-describe-symbol)
+     ("C-h F" . 'counsel-describe-face)
+     ("C-x L" . 'counsel-find-library)
+     ("C-c C-r" . 'counsel-resume)
+     ("C-`" . 'counsel-unicode-char))
+    :init
+    (ivy-mode 1))
+#+end_src
 
 ** Ivy Rich
 
-   #+begin_src emacs-lisp
-     (use-package ivy-rich
-       :diminish
-       :init
-       (ivy-rich-mode 1))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+    :diminish
+    :init
+    (ivy-rich-mode 1))
+#+end_src
 
 ** Ivy All-The-Icons
 
-   #+begin_src emacs-lisp
-     (use-package all-the-icons-ivy-rich
-       :diminish
-       :init
-       (all-the-icons-ivy-rich-mode 1))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package all-the-icons-ivy-rich
+    :diminish
+    :init
+    (all-the-icons-ivy-rich-mode 1))
+#+end_src
 
 ** Counsel
 
-   #+begin_src emacs-lisp
-     (use-package counsel
-       :diminish
-       :bind
-       (("s-f" . swiper)
-	("s-g" . counsel-grep)))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package counsel
+    :diminish
+    :bind
+    (("s-f" . swiper)
+     ("s-g" . counsel-grep)))
+#+end_src
+
+** IBuffer
+
+IBuffer is an advanced replacement for BufferMenu, which lets you operate on buffers in a Dired-fashion.
+
+|---------+----------------------+--------------------------------------------|
+| Keybind | Command              | Description                                |
+|---------+----------------------+--------------------------------------------|
+| ~C-x C-b~ | ibuffer-other-window | Opens an IBuffer buffer in another window. |
+|---------+----------------------+--------------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package ibuffer
+    :bind
+    (("C-x C-b" . ibuffer-other-window))
+    :config
+    (setq-default ibuffer-show-empty-filter-groups nil)
+    (setq ibuffer-display-summary t))
+#+end_src
+
+** IBuffer VC
+
+IBuffer-VC is a package that integrates IBuffer with Version Control information.
+
+#+begin_src emacs-lisp
+  (use-package ibuffer-vc
+    :after (ibuffer vc)
+    :hook
+    (ibuffer-mode . ibuffer-vc-set-filter-groups-by-vc-root))
+#+end_src
 
 * Packages
+** Magit
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :diminish)
+#+end_src
+
 ** Elcord
 
-   Elcord is a minor-mode that integrates with Discord's Rich Presence API.
+Elcord is a minor-mode that integrates with Discord's Rich Presence API.
    
-   #+begin_src emacs-lisp
-     (use-package elcord
-       :init
-       (elcord-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package elcord
+    :init
+    (elcord-mode))
+#+end_src
 
 ** Which Key
 
