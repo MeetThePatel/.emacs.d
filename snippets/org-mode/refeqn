@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: refeqn
+# key: refeqn
+# --
+[[${1:link}][${2:description}]]

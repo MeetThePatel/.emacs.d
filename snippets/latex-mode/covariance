@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Covariance
+# key: Cov
+# --
+\Cov[$1]$0

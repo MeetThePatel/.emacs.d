@@ -58,6 +58,14 @@ Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs buil
     (fringe-mode 5))
 #+end_src
 
+** Frame Title
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    (setq-default frame-title-format '("Emacs - %b (%f)")))
+#+end_src
+
 ** Fonts
 
 #+begin_src emacs-lisp
@@ -499,7 +507,19 @@ IBuffer-VC is a package that integrates IBuffer with Version Control information
     :hook (prog-mode . lsp-mode)
     :commands lsp
     :config
-    (setq lsp-keymap-prefix "s-l"))
+    (setq lsp-keymap-prefix "s-l"
+          lsp-enable-symbol-highlighting nil))
+#+end_src
+
+** Company LSP
+
+#+begin_src emacs-lisp
+  (use-package company-lsp
+    :after (company lsp-mode)
+    :config
+    (setq company-lsp-async t
+          company-lsp-enable-recompletion t
+          company-lsp-enable-snippet t))
 #+end_src
 
 ** LSP UI
@@ -542,6 +562,99 @@ IBuffer-VC is a package that integrates IBuffer with Version Control information
     (global-flycheck-mode))
 #+end_src
 
+** FlySpell
+
+#+begin_src emacs-lisp
+  (use-package flyspell
+    :diminish
+    :hook ((org-mode markdown-mode) . flyspell-mode))
+#+end_src
+
+*** FlySpell Correct
+
+#+begin_src emacs-lisp
+  (use-package flyspell-correct
+    :after (flyspell)
+    :bind
+    (:map flyspell-mode-map
+          ("C-;" . flyspell-correct-wrapper)))
+#+end_src
+
+**** Ivy Integration
+
+When inside the Ivy menu, if you want to add a word to the dictionary, you need to use ~M-o~ to bring up a menu.
+
+#+begin_src emacs-lisp
+  (use-package flyspell-correct-ivy
+    :after (flyspell-correct))
+#+end_src
+
+* YASnippet
+
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :diminish (yas-minor-mode)
+    :config
+    (setq yas-triggers-in-field t
+          yas-snippets-dirs '("~/.emacs.d/snippets"))
+    :init
+    (yas-global-mode 1))
+#+end_src
+
+** Company Integration
+
+#+begin_src emacs-lisp
+  (defun company-yasnippet-or-completion ()
+    (interactive)
+    (let ((yas-fallback-behavior nil))
+      (unless (yas-expand)
+        (call-interactively #'company-complete-common))))
+
+  (add-hook 'company-mode-hook
+            (lambda () (substitute-key-definition
+                        'company-complete-common
+                        'company-yasnippet-or-completion
+                        company-active-map)))
+#+end_src
+
+* C/C++
+** LSP Setup for C++
+
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :config
+    (setq lsp-clients-clangd-executable "/usr/local/opt/llvm/bin/clangd"
+          lsp-clients-clangd-args '("--suggest-missing-includes"
+                                    "-j=4"
+                                    "-background-index"
+                                    "--all-scopes-completion"
+                                    "--clang-tidy"
+                                    "--compile-commands-dir=build"
+                                    "--cross-file-rename")))
+#+end_src
+
+** Modern C++ Font Lock
+
+This minor-mode provides syntax highlighting for Modern C++, updated to the C++20 TS.
+
+#+begin_src emacs-lisp
+  (use-package modern-cpp-font-lock
+    :diminish
+    :init
+    (modern-c++-font-lock-global-mode t))
+#+end_src
+
+** Flycheck Clang Tidy
+
+#+begin_src emacs-lisp
+  (use-package flycheck-clang-tidy
+    :after (flycheck)
+    :hook
+    (flycheck-mode . flycheck-clang-tidy-setup)
+    :config
+    (setq flycheck-clang-language-standard "c++17"))
+#+end_src
+
 * Miscellaneous Packages
 ** Magit
 
@@ -557,8 +670,8 @@ IBuffer-VC is a package that integrates IBuffer with Version Control information
 |-----------+--------------------------+-----------------------------------------------|
 | ~<SPC> g g~ | git-gutter:popout-hunk   | Pop out the modified chunk into a new buffer. |
 | ~<SPC> g s~ | git-gutter:stage-hunk    | Stage the modified chunk.                     |
-| ~<SPC> g j~ | git-gutter:next-diff     | Move to the next modified chunk.              |
-| ~<SPC> g k~ | git-gutter:previous-diff | Move to the previous modified chunk.          |
+| ~<SPC> g j~ | git-gutter:next-hunk     | Move to the next modified chunk.              |
+| ~<SPC> g k~ | git-gutter:previous-hunk | Move to the previous modified chunk.          |
 | ~<SPC> g R~ | git-gutter:revert-hunk   | Revert the modified chunk.                    |
 |-----------+--------------------------+-----------------------------------------------|
 
@@ -569,8 +682,8 @@ IBuffer-VC is a package that integrates IBuffer with Version Control information
     (evil-leader/set-key
       "g g" 'git-gutter:popup-hunk
       "g s" 'git-gutter:stage-hunk
-      "g j" 'git-gutter:next-diff
-      "g k" 'git-gutter:previous-diff
+      "g j" 'git-gutter:next-hunk
+      "g k" 'git-gutter:previous-hunk
       "g R" 'git-gutter:revert-hunk)
     (custom-set-variables
      '(git-gutter:update-interval 2)

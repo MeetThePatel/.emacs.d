@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ConvergenceInDistribution
+# key: convd
+# --
+\stackrel{d}{\to}

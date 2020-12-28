@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: OrgModeLatexHeader
+# key: OMLH
+# --
+#+STARTUP: latexpreview
+#+LATEX_HEADER: \usepackage{physics, bm}
+#+LATEX_HEADER: \usepackage{amsmath, amsfonts, amsthm, mathtools, amssymb}
+#+LATEX_HEADER: \newcommand{\CC}{\mathbb C} \newcommand{\FF}{\mathbb F} \newcommand{\NN}{\mathbb N} \newcommand{\QQ}{\mathbb Q} \newcommand{\RR}{\mathbb R} \newcommand{\ZZ}{\mathbb Z} \newcommand{\HH}{\mathbb H} \newcommand{\II}{\mathbb I} \newcommand{\MM}{\mathbb M} \newcommand{\PP}{\mathbb P} \newcommand{\GGG}{\mathcal G} \newcommand{\BBB}{\mathcal B} \newcommand{\FFF}{\mathcal F} \newcommand{\LLLL}{\mathcal L} \newcommand{\EV}[1]{\mathbb{E}\left[ #1 \right]} \newcommand{\VAR}[1]{\mathbb{V}\left[ #1 \right]} \newcommand{\Cov}[1]{\text{Cov} \left( #1 \right)} \newcommand{\Corr}[1]{\text{Corr} \left( #1 \right)}

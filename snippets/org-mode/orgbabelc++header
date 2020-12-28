@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: OrgBabelC++Header
+# key: orgbabelcheader
+# --
+:flags "--std=c++14" :includes <bits/stdc++.h>

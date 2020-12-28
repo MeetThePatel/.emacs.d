@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: cpboilerplate
+# key: cpbp
+# --
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int main() {
+    
+}

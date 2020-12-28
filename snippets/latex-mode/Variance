@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Variance
+# key: VAR
+# --
+\VAR[$1]$0

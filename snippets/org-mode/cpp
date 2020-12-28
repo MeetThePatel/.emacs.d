@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: c++
+# key: cpp
+# --
+#+begin_src c++ :flags "--std=c++14" :includes <bits/stdc++.h>
+$0
+#+end_src

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: example
+# key: example
+# --
+\begin{example}{$1}{$3}
+$2
+\end{example}$0

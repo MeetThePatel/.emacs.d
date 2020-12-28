@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: corollary
+# key: corr
+# --
+\begin{corollary}{$1}{$3}
+$2
+\end{corollary}$0
