@@ -41,7 +41,7 @@ Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs buil
           mac-command-modifier       'super
           mac-right-command-modifier 'super))
 #+end_src
-   
+
 * User Interface
 
 #+begin_src emacs-lisp
@@ -491,6 +491,57 @@ IBuffer-VC is a package that integrates IBuffer with Version Control information
     :hook (after-make-frame-functions . --set-emoji-font))
 #+end_src
 
+* Language Server Protocol
+
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :diminish
+    :hook (prog-mode . lsp-mode)
+    :commands lsp
+    :config
+    (setq lsp-keymap-prefix "s-l"))
+#+end_src
+
+** LSP UI
+
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :after (lsp-mode)
+    :diminish
+    :commands lsp-ui-mode
+    :hook (lsp-mode . lsp-ui-mode)
+    :config
+    (setq lsp-ui-doc-enable t
+          lsp-ui-doc-use-childframe t
+          lsp-ui-doc-position 'top
+          lsp-ui-doc-include-signature t
+          lsp-ui-sideline-enable nil
+          lsp-ui-flycheck-enable t
+          lsp-ui-flycheck-list-position 'right
+          lsp-ui-flycheck-live-reporting t
+          lsp-ui-peek-enable t
+          lsp-ui-peek-list-width 60
+          lsp-ui-peek-peek-height 25))
+#+end_src
+
+** LSP Ivy
+
+#+begin_src emacs-lisp
+  (use-package lsp-ivy
+    :after (lsp-mode ivy)
+    :diminish
+    :commands lsp-ivy-workspace-symbol)
+#+end_src
+
+* Flycheck
+
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :diminish
+    :init
+    (global-flycheck-mode))
+#+end_src
+
 * Miscellaneous Packages
 ** Magit
 
@@ -513,6 +564,7 @@ IBuffer-VC is a package that integrates IBuffer with Version Control information
 
 #+begin_src emacs-lisp
   (use-package git-gutter
+    :diminish
     :config
     (evil-leader/set-key
       "g g" 'git-gutter:popup-hunk

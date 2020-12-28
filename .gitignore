@@ -5,3 +5,4 @@ settings.el
 custom.el
 *.html
 transient/
+.lsp-session-v1
