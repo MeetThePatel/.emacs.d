@@ -42,6 +42,14 @@ Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs buil
           mac-right-command-modifier 'super))
 #+end_src
 
+** Backups
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    (setq make-backup-files nil))
+#+end_src
+
 * User Interface
 
 #+begin_src emacs-lisp
@@ -155,7 +163,9 @@ Rainbow mode is a minor-mode which highlights text representing color codes by s
           ("k" . 'evil-previous-visual-line))
     :init
     (setq evil-want-integration t
-          evil-want-keybinding nil)
+          evil-want-keybinding nil
+          evil-want-fine-undo 'fine
+          evil-undo-system 'undo-tree)
     (evil-mode))
 #+end_src
 
@@ -499,6 +509,16 @@ IBuffer-VC is a package that integrates IBuffer with Version Control information
     :hook (after-make-frame-functions . --set-emoji-font))
 #+end_src
 
+** Company Math
+
+#+begin_src emacs-lisp
+  (use-package company-math
+    :diminish
+    :config
+    (add-to-list 'company-backends 'company-math-symbols-unicode)
+    (add-to-list 'company-backends 'company-math-symbols-latex))
+#+end_src
+
 * Language Server Protocol
 
 #+begin_src emacs-lisp
@@ -617,6 +637,56 @@ When inside the Ivy menu, if you want to add a word to the dictionary, you need 
                         company-active-map)))
 #+end_src
 
+* Projectile
+
+|-----------+---------------------------------+----------------------------------------------------|
+| Keybind   | Command                         | Description                                        |
+|-----------+---------------------------------+----------------------------------------------------|
+| ~<SPC> p D~ | projectile-remove-known-project | Removes a project from the list of known projects. |
+|-----------+---------------------------------+----------------------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package projectile
+    :diminish
+    :config
+    (evil-leader/set-key
+      "p D" 'projectile-remove-known-project)
+    :init
+    (projectile-mode 1))
+#+end_src
+
+** Ivy Integration
+
+|-----------+-------------------------------------+-----------------------------------------------|
+| Keybind   | Command                             | Description                                   |
+|-----------+-------------------------------------+-----------------------------------------------|
+| ~<SPC> p f~ | counsel-projectile-find-file        | Searches the current project for a file.      |
+| ~<SPC> p d~ | counsel-projectile-find-dir         | Searches the current project for a directory. |
+| ~<SPC> p b~ | counsel-projectile-switch-to-buffer | Jump to a buffer in the current project.      |
+| ~<SPC> p p~ | counsel-projectile-switch-project   | Switch to a project.                          |
+| ~<SPC> p s~ | counsel-projectile-rg               | Run RipGrep on a project.                     |
+|-----------+-------------------------------------+-----------------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package counsel-projectile
+    :after (counsel projectile)
+    :diminish
+    :config
+    (evil-leader/set-key
+      "p f" 'counsel-projectile-find-file
+      "p d" 'counsel-projectile-find-dir
+      "p b" 'counsel-projectile-switch-to-buffer
+      "p p" 'counsel-projectile-switch-project
+      "p s" 'counsel-projectile-rg))
+#+end_src
+
+** Flycheck Projectile
+
+#+begin_src emacs-lisp
+  (use-package flycheck-projectile
+    :diminish)
+#+end_src
+
 * C/C++
 ** LSP Setup for C++
 
@@ -656,6 +726,50 @@ This minor-mode provides syntax highlighting for Modern C++, updated to the C++2
 #+end_src
 
 * Miscellaneous Packages
+** Undo Tree
+
+Undo-Tree is a minor mode that allows for more advanced control of undo/redo operations.
+
+|---------+---------------------+-------------------------------------------|
+| Keybind | Command             | Description                               |
+|---------+---------------------+-------------------------------------------|
+| ~C-x u~   | undo-tree-visualize | Visualize the current buffer's undo tree. |
+|---------+---------------------+-------------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package undo-tree
+    :diminish
+    :config
+    (global-undo-tree-mode 1))
+#+end_src
+
+** Ace Jump
+
+|---------+---------------+---------------------------------|
+| Keybind | Command       | Description                     |
+|---------+---------------+---------------------------------|
+| ~<SPC> /~ | ace-jump-mode | Initiate an ace-jump keystroke. |
+|---------+---------------+---------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package ace-jump-mode
+    :diminish
+    :config
+    (evil-leader/set-key
+      "/" 'ace-jump-mode))
+#+end_src
+
+** PDF Tools
+
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :diminish
+    :config
+    (setq-default pdf-view-display-size 'fit-page)
+    :hook
+    (pdf-view-mode . (lambda () (display-line-numbers-mode 0))))
+#+end_src
+
 ** Magit
 
 #+begin_src emacs-lisp
@@ -699,6 +813,22 @@ This minor-mode provides syntax highlighting for Modern C++, updated to the C++2
     (set-face-foreground 'git-gutter:deleted "#ff7675")
     :init
     (global-git-gutter-mode 1))
+#+end_src
+
+** Electric Pair
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :hook (prog-mode . electric-pair-mode))
+#+end_src
+
+** Hungry Delete
+
+#+begin_src emacs-lisp
+  (use-package hungry-delete
+    :diminish
+    :init
+    (global-hungry-delete-mode))
 #+end_src
 
 ** Winum
@@ -784,4 +914,23 @@ WhichKey is a minor-mode that displays available keybinds in a popup side-buffer
     (setq which-key-idle-delay 0.5)
     :init
     (which-key-mode))
+#+end_src
+
+* Custom Functions
+** Always rebuild init and refresh package cache
+
+When Org-Babel evaluates this org file, it strips the elisp code out and evaluates that. This function ensures that the settings.el file is always up to date with settings.org. To make sure that this is always up to date, add this function to the =kill-emacs-hook=.
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    (defun meet/rebuild-emacs-init ()
+      (let ((init-el "~/.emacs.d/settings.el")
+            (init-org "~/.emacs.d/settings.org"))
+        (when (file-exists-p init-el)
+          (delete-file init-el))
+        (org-babel-tangle-file init-org init-el)))
+    :hook
+    ((kill-emacs-hook . meet/rebuild-emacs-init)
+     (kill-emacs-hook . package-quickstart-refresh)))
 #+end_src

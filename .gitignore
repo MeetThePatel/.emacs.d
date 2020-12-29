@@ -6,3 +6,4 @@ custom.el
 *.html
 transient/
 .lsp-session-v1
+projectile-bookmarks.eld
