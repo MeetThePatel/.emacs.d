@@ -92,8 +92,22 @@ Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs buil
   (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 
   (use-package kaolin-themes
-    :config
+    :init
     (load-theme 'kaolin-breeze t))
+#+end_src
+
+** Doom Modeline
+
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :config
+    (setq doom-modeline-height 0
+          doom-modeline-bar-width 5
+          doom-modeline-project-detection 'projectile
+          doom-modeline-lsp 1
+          all-the-icons-scale-factor 1.1)
+    (set-face-attribute 'mode-line nil :family "Menlo" :height 150)
+    (set-face-attribute 'mode-line-inactive nil :family "Menlo" :height 150))
 #+end_src
 
 ** Visual Bell
@@ -119,6 +133,24 @@ Instead of playing an annoying sound when an error occurs, breifly invert the co
   (setq ring-bell-function 'meet/visual-bell-modeline-flash)
 #+end_src
    
+** Pretty Mode
+
+#+begin_src emacs-lisp
+  (use-package pretty-mode
+    :diminish
+    :init
+    (global-pretty-mode t))
+#+end_src
+
+** Prettify Mode
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :diminish
+    :init
+    (global-prettify-symbols-mode 1))
+#+end_src
+
 ** HL Line
 
 HL-Line mode is a minor mode that highlights the current line.
