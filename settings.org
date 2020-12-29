@@ -31,7 +31,7 @@ Start Emacs with an empty Org-mode buffer in the home directory.
 
 ** Mitsuharu Yamamoto Emacs Configuration
 
-Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs build for macOS, we have to switch what each modifier key does back to the default.
+Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs build for MacOS, we have to switch what each modifier key does back to the default.
    
 #+begin_src emacs-lisp
   (use-package emacs
@@ -393,6 +393,21 @@ This minor-mode automatically toggles org-mode LaTeX fragments as the cursor ent
      ("C-`" . 'counsel-unicode-char))
     :init
     (ivy-mode 1))
+#+end_src
+
+** Ivy Posframe
+
+This package allows for Ivy to show up in a posframe that is customizable to show at different parts of the screen. Currently, it is set to show at the window center.
+
+#+begin_src emacs-lisp
+  (use-package ivy-posframe
+    :diminish
+    :config
+    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center))
+          ivy-posframe-parameters '((left-fringe . 0)
+                                    (right-fringe . 0)))
+    :init
+    (ivy-posframe-mode 1))
 #+end_src
 
 ** Ivy Rich
@@ -770,6 +785,39 @@ Undo-Tree is a minor mode that allows for more advanced control of undo/redo ope
     (pdf-view-mode . (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
+** LanguageTool
+
+LanguageTool is a style and grammar checker (similar to Grammarly).
+
+To use this package, first install LanguageTool (and java). For MacOS, Homebrew is a good installation tool. Run:
+
+#+begin_src bash
+  brew install languagetool
+#+end_src
+
+|-----------+--------------------------------+-------------------------------------------------------------------|
+| Keybind   | Command                        | Description                                                       |
+|-----------+--------------------------------+-------------------------------------------------------------------|
+| ~<SPC> ; ;~ | langtool-correct-buffer        | Open an interactive correction buffer.                            |
+| ~<SPC> ; c~ | langtool-check                 | Check the current buffer and light up errors.                     |
+| ~<SPC> ; m~ | langtool-show-message-at-point | Show error details at point.                                      |
+| ~<SPC> ; f~ | langtool-check-done            | Finish LanguageTool process and cleanup existing colorized texts. |
+| ~<SPC> ; K~ | langtool-server-stop           | Terminate LanguageTool HTTP server.                               |
+|-----------+--------------------------------+-------------------------------------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package langtool
+    :config
+    (evil-leader/set-key
+      "; c" 'langtool-check
+      "; ;" 'langtool-correct-buffer
+      "; f" 'langtool-check-done
+      "; m" 'langtool-show-message-at-point
+      "; K" 'langtool-server-stop)
+    :init
+    (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/5.1.3_2/libexec/languagetool-commandline.jar"))
+#+end_src
+
 ** Magit
 
 #+begin_src emacs-lisp
@@ -829,6 +877,19 @@ Undo-Tree is a minor mode that allows for more advanced control of undo/redo ope
     :diminish
     :init
     (global-hungry-delete-mode))
+#+end_src
+
+** Perspective
+
+Perspective provides named workspaces. Each perspective has its own buffer list and its own window layout.
+
+#+begin_src emacs-lisp
+  (use-package perspective
+    :after (projectile)
+    :config
+    (setq persp-state-default-file "~/.emacs.d/perspective-state")
+    :init
+    (persp-mode))
 #+end_src
 
 ** Winum
@@ -899,6 +960,18 @@ Elcord is a minor-mode that integrates with Discord's Rich Presence API.
   (use-package elcord
     :init
     (elcord-mode))
+#+end_src
+
+** MacOS Trash
+
+Make delete-by-moving-to-trash do what you expect it to do on MacOS.
+
+#+begin_src emacs-lisp
+  (use-package osx-trash
+    :config
+    (setq delete-by-moving-to-trash t)
+    :init
+    (osx-trash-setup))
 #+end_src
 
 ** Which Key
