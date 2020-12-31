@@ -7,6 +7,7 @@
 Profile how long it takes for Emacs to startup
    
 #+begin_src emacs-lisp
+  (setq gc-cons-threshold #x40000000)
   (add-hook 'emacs-startup-hook
             (lambda ()
               (message "Emacs ready in %s with %d garbage collections."
@@ -62,8 +63,9 @@ Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs buil
     (blink-cursor-mode -1)
     (global-visual-line-mode)
     (column-number-mode 1)
+    (setq-default  display-line-numbers-type 'relative)
     (global-display-line-numbers-mode 1)
-    (fringe-mode 5))
+    (fringe-mode 0))
 #+end_src
 
 ** Frame Title
@@ -100,6 +102,8 @@ Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs buil
 
 #+begin_src emacs-lisp
   (use-package doom-modeline
+    :init
+    (doom-modeline-mode 1)
     :config
     (setq doom-modeline-height 0
           doom-modeline-bar-width 5
@@ -168,7 +172,7 @@ Rainbow mode is a minor-mode which highlights text representing color codes by s
 #+begin_src emacs-lisp
   (use-package rainbow-mode
     :diminish
-    :hook (after-init . rainbow-mode))
+    :hook ((after-init org-mode css-mode html-mode) . rainbow-mode))
 #+end_src
 
 ** Rainbow Delimiters
@@ -879,18 +883,17 @@ To use this package, first install LanguageTool (and java). For MacOS, Homebrew 
       "g j" 'git-gutter:next-hunk
       "g k" 'git-gutter:previous-hunk
       "g R" 'git-gutter:revert-hunk)
-    (custom-set-variables
-     '(git-gutter:update-interval 2)
-     '(git-gutter:added-sign "+")
-     '(git-gutter:modified-sign "*")
-     '(git-gutter:deleted-sign "-")
-     '(git-gutter:hide-gutter nil))
-    (set-face-background 'git-gutter:added "#00b894")
+     (setq-default git-gutter:update-interval 2
+                   git-gutter:added-sign "+"
+                   git-gutter:modified-sign "*"
+                   git-gutter:deleted-sign "-"
+                   git-gutter:hide-gutter nil)
     (set-face-foreground 'git-gutter:added "#00b894")
-    (set-face-background 'git-gutter:modified "#fdcb6e")
     (set-face-foreground 'git-gutter:modified "#fdcb6e")
-    (set-face-background 'git-gutter:deleted "#ff7675")
     (set-face-foreground 'git-gutter:deleted "#ff7675")
+    (set-face-background 'git-gutter:added "#00b894")
+    (set-face-background 'git-gutter:modified "#fdcb6e")
+    (set-face-background 'git-gutter:deleted "#ff7675")
     :init
     (global-git-gutter-mode 1))
 #+end_src
@@ -900,6 +903,25 @@ To use this package, first install LanguageTool (and java). For MacOS, Homebrew 
 #+begin_src emacs-lisp
   (use-package emacs
     :hook (prog-mode . electric-pair-mode))
+#+end_src
+
+** Emacs Dashboard
+
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :config
+    (setq dashboard-center-content nil
+          dashboard-show-shortcuts t
+          dashboard-startup-banner 1
+          dashbaord-set-heading-icons t
+          dashboard-set-navigator t
+          dashboard-set-init-info t
+          dashbaord-set-file-icons t
+          dashboard-items '((recents . 5)
+                            (bookmarks . 5)
+                            (projects . 5)
+                            (agenda . 5)))
+    (dashboard-setup-startup-hook))
 #+end_src
 
 ** Hungry Delete

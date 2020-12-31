@@ -7,3 +7,4 @@ custom.el
 transient/
 .lsp-session-v1
 projectile-bookmarks.eld
+recentf
