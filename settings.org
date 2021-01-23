@@ -7,14 +7,18 @@
 Profile how long it takes for Emacs to startup
    
 #+begin_src emacs-lisp
-  (setq gc-cons-threshold #x40000000)
-  (add-hook 'emacs-startup-hook
+  (use-package emacs
+    :init
+    (setq gc-cons-threshold 80000000)
+    :config
+    (add-hook 'emacs-startup-hook
             (lambda ()
+              (setq gc-cons-threshold 800000)
               (message "Emacs ready in %s with %d garbage collections."
                        (format "%.2f seconds"
                                (float-time
                                 (time-subtract after-init-time before-init-time)))
-                       gcs-done)))
+                       gcs-done))))
 #+end_src
 
 ** Startup Screen
@@ -51,6 +55,12 @@ Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs buil
     (setq make-backup-files nil))
 #+end_src
 
+** Load Lisp Directory
+
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/lisp")
+#+end_src
+
 * User Interface
 
 #+begin_src emacs-lisp
@@ -69,6 +79,12 @@ Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs buil
 #+end_src
 
 ** Frame Title
+
+To get a transparent titlebar, run
+
+#+begin_src bash
+  defaults write org.gnu.Emacs TransparentTitleBar LIGHT
+#+end_src
 
 #+begin_src emacs-lisp
   (use-package emacs
@@ -95,7 +111,7 @@ Since this emacs configuration is targetted at Mitsuharu Yamamoto’s Emacs buil
 
   (use-package kaolin-themes
     :init
-    (load-theme 'kaolin-breeze t))
+    (load-theme 'kaolin-aurora t))
 #+end_src
 
 ** Doom Modeline
@@ -153,6 +169,28 @@ Instead of playing an annoying sound when an error occurs, breifly invert the co
     :diminish
     :init
     (global-prettify-symbols-mode 1))
+#+end_src
+
+** Show Parens Mode
+
+This mode highlights the matching parenthesis.
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :init
+    (show-paren-mode 1))
+#+end_src
+
+** HL Indent Guide
+
+This minor mode gives a visual indicator for the indentation.
+
+#+begin_src emacs-lisp
+  (use-package highlight-indent-guides
+    :hook
+    (prog-mode . highlight-indent-guides-mode)
+    :config
+    (setq highlight-indent-guides-method 'character))
 #+end_src
 
 ** HL Line
@@ -219,7 +257,8 @@ Rainbow mode is a minor-mode which highlights text representing color codes by s
     (evil-leader/set-key
       "<SPC>" 'delete-other-windows
       "w" 'kill-this-buffer
-      "k" 'kill-buffer))
+      "k" 'kill-buffer
+      "B" '(lambda () (interactive) (counsel-bookmark))))
 #+end_src
 
 ** Evil Org
@@ -388,7 +427,8 @@ Examples:
           org-hide-block-startup t
           org-src-tab-acts-natively t
           org-src-window-setup 'split-window-below
-          org-image-actual-width nil)
+          org-image-actual-width nil
+          org-log-done 'note)
     :hook (org-mode . org-indent-mode))
 #+end_src
 
@@ -401,6 +441,16 @@ This minor-mode shows org-mode bullets as UTF-8 characters.
     :hook (org-mode . org-bullets-mode))
 #+end_src
 
+** Org Agenda
+
+#+begin_src emacs-lisp
+  (use-package org
+    :config
+    (add-to-list 'org-agenda-files "~/Google Drive/org/TODO.org")
+    (evil-leader/set-key
+      "a" 'org-agenda))
+#+end_src
+
 ** Org FragTog
 
 This minor-mode automatically toggles org-mode LaTeX fragments as the cursor enters and exits them.
@@ -410,6 +460,13 @@ This minor-mode automatically toggles org-mode LaTeX fragments as the cursor ent
     :hook (org-mode . org-fragtog-mode))
 #+end_src
    
+** Org PDFView
+
+#+begin_src emacs-lisp
+  (use-package org-pdftools
+    :hook (org-mode . org-pdftools-setup-link))
+#+end_src
+
 * Ivy
 ** Ivy
 
@@ -433,18 +490,20 @@ This minor-mode automatically toggles org-mode LaTeX fragments as the cursor ent
 
 ** Ivy Posframe
 
+Disabled.
+
 This package allows for Ivy to show up in a posframe that is customizable to show at different parts of the screen. Currently, it is set to show at the window center.
 
-#+begin_src emacs-lisp
-  (use-package ivy-posframe
-    :diminish
-    :config
-    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center))
-          ivy-posframe-parameters '((left-fringe . 0)
-                                    (right-fringe . 0)))
-    :init
-    (ivy-posframe-mode 1))
-#+end_src
+# #+begin_src emacs-lisp
+#   (use-package ivy-posframe
+#     :diminish
+#     :config
+#     (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left))
+#           ivy-posframe-parameters '((left-fringe . 0)
+#                                     (right-fringe . 0)))
+#     :init
+#     (ivy-posframe-mode 1))
+# #+end_src
 
 ** Ivy Rich
 
@@ -738,7 +797,51 @@ When inside the Ivy menu, if you want to add a word to the dictionary, you need 
     :diminish)
 #+end_src
 
+* Dired
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :bind
+    (:map dired-mode-map
+          ("<RET>" . dired-find-alternate-file)))
+#+end_src
+
+** Dired Git Info
+
+#+begin_src emacs-lisp
+  (use-package dired-git-info
+    :bind
+    (:map dired-mode-map
+          ("C-(" . dired-git-info-mode)))
+#+end_src
+
+** Dired Font Lock
+
+#+begin_src emacs-lisp
+  (use-package diredfl
+    :config
+    (setq diredfl-ignore-compressed-flag nil)
+    :init
+    (diredfl-global-mode))
+#+end_src
+
+** Dired Subtree
+
+#+begin_src emacs-lisp
+  (use-package dired-subtree
+    :bind
+    (:map dired-mode-map
+          ("<tab>" . dired-subtree-toggle)
+          ("<C-tab>" . dired-subtree-cycle)))
+#+end_src
 * C/C++
+
+Open header files in C++ mode:
+
+#+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+#+end_src
+
 ** LSP Setup for C++
 
 #+begin_src emacs-lisp
@@ -774,6 +877,12 @@ This minor-mode provides syntax highlighting for Modern C++, updated to the C++2
     (flycheck-mode . flycheck-clang-tidy-setup)
     :config
     (setq flycheck-clang-language-standard "c++17"))
+#+end_src
+
+** CMake
+
+#+begin_src emacs-lisp
+  (use-package cmake-mode)
 #+end_src
 
 * Miscellaneous Packages
@@ -821,6 +930,17 @@ Undo-Tree is a minor mode that allows for more advanced control of undo/redo ope
     (pdf-view-mode . (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
+** Hide/Show Mode
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :bind
+    (:map evil-normal-state-map
+          ([tab] . hs-toggle-hiding))
+    :hook
+    (prog-mode . hs-minor-mode))
+#+end_src
+
 ** LanguageTool
 
 LanguageTool is a style and grammar checker (similar to Grammarly).
@@ -852,6 +972,36 @@ To use this package, first install LanguageTool (and java). For MacOS, Homebrew 
       "; K" 'langtool-server-stop)
     :init
     (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/5.1.3_2/libexec/languagetool-commandline.jar"))
+#+end_src
+
+** HL Todo
+
+This minor mode highlights "TODO" in all buffers.
+
+|-----------+------------------+------------------------------------|
+| Keybind   | Command          | Description                        |
+|-----------+------------------+------------------------------------|
+| ~<SPC> t j~ | hl-todo-next     | Go to next TODO.                   |
+| ~<SPC> t k~ | hl-todo-previous | Go to previous TODO.               |
+| ~<SPC> t /~ | hl-todo-occur    | Create a buffer showing all TODOs. |
+| ~<SPC> t t~ | hl-todo-insert   | Create a new TODO.                 |
+|-----------+------------------+------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package hl-todo
+    :config
+    (setq hl-todo-keyword-faces
+          '(("TODO"		.	"#00b894")
+            ("FIXME"	.	"#ff7675")
+            ("DEBUG"	.	"#fdcb6e")
+            ("FEATURE"	.	"#1e90ff")))
+    (evil-leader/set-key
+      "t j" 'hl-todo-next
+      "t k" 'hl-todo-previous
+      "t /" 'hl-todo-occur
+      "t t" 'hl-todo-insert)
+    :init
+    (global-hl-todo-mode))
 #+end_src
 
 ** Magit
@@ -1016,6 +1166,22 @@ Elcord is a minor-mode that integrates with Discord's Rich Presence API.
     (elcord-mode))
 #+end_src
 
+** Scratch
+
+Scratch is a package to help with creating scratch buffers.
+
+|---------+---------+--------------------------------------------------|
+| Keybind | Command | Description                                      |
+|---------+---------+--------------------------------------------------|
+| ~S-t~     | scratch | Get a scratch buffer for the current major mode. |
+|---------+---------+--------------------------------------------------|
+
+#+begin_src emacs-lisp
+  (use-package scratch
+    :bind
+    (("s-t" . scratch)))
+#+end_src
+
 ** MacOS Trash
 
 Make delete-by-moving-to-trash do what you expect it to do on MacOS.
@@ -1044,6 +1210,20 @@ WhichKey is a minor-mode that displays available keybinds in a popup side-buffer
 #+end_src
 
 * Custom Functions
+** Run compile command in different directory.
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    (defun meet/compile-in-directory (dir)
+      "Runs command with default-directory set to the given directory."
+      (interactive "DIn directory: ")
+      (let ((default-directory dir))
+        (call-interactively 'compile)))
+    :bind
+    (("<f5>" . meet/compile-in-directory)))
+#+end_src
+
 ** Always rebuild init and refresh package cache
 
 When Org-Babel evaluates this org file, it strips the elisp code out and evaluates that. This function ensures that the settings.el file is always up to date with settings.org. To make sure that this is always up to date, add this function to the =kill-emacs-hook=.
@@ -1060,4 +1240,44 @@ When Org-Babel evaluates this org file, it strips the elisp code out and evaluat
     :hook
     ((kill-emacs-hook . meet/rebuild-emacs-init)
      (kill-emacs-hook . package-quickstart-refresh)))
+#+end_src
+
+** Open File in External App
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    (defun meet/open-in-external-app (&optional @fname)
+      "Open the current file or dired marked files in external app.
+  When called in emacs lisp, if @FNAME is given, open that."
+      (interactive)
+      (let* (
+             ($file-list
+              (if @fname
+                  (progn (list @fname))
+                (if (string-equal major-mode "dired-mode")
+                    (dired-get-marked-files)
+                  (list (buffer-file-name)))))
+             ($do-it-p (if (<= (length $file-list) 5)
+                           t
+                         (y-or-n-p "Open more than 5 files? "))))
+        (when $do-it-p
+          (cond
+           ((string-equal system-type "windows-nt")
+            (mapc
+             (lambda ($fpath)
+               (shell-command (concat "PowerShell -Command invoke-item " (shell-quote-argument (expand-file-name $fpath )))))
+             $file-list))
+           ((string-equal system-type "darwin")
+            (mapc
+             (lambda ($fpath)
+               (shell-command
+                (concat "open " (shell-quote-argument $fpath))))  $file-list))
+           ((string-equal system-type "gnu/linux")
+            (mapc
+             (lambda ($fpath) (let ((process-connection-type nil))
+                           (start-process "" nil "xdg-open" $fpath))) $file-list))))))
+    :bind
+    (:map dired-mode-map
+          ("C-x C-o" . meet/open-in-external-app)))
 #+end_src
