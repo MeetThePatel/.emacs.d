@@ -1,0 +1,15 @@
+.backups/
+.cache/
+auto-save-list/
+eln-cache/
+eshell/
+request/
+straight/
+undo/
+.DS_Store
+.org-id-locations
+org-roam.db
+projectile-bookmarks.eld
+projectile.cache
+recentf
+bookmarks
